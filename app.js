@@ -2,7 +2,7 @@ import bodyParser from 'body-parser';
 import debounce from 'debounce';
 import { app, errorHandler } from 'mu';
 import { filterDeltaForInsertedType } from './lib/delta';
-import linkStaatsblad from './queries/select-without-uuid';
+import linkStaatsblad from './queries/link-staatsblad';
 
 const LEGAL_RESOURCE = 'http://data.europa.eu/eli/ontology#LegalResource';
 
