@@ -8,7 +8,7 @@ This service monitors for new `LegalResource`'s ("Publications") in [Staatsblad-
 
 ```yaml
   staatsblad-linking:
-    build: https://github.com/kanselarij-vlaanderen/uuid-generation-service.git
+    image: kanselarij/staatsblad-linking-service:0.2.0
 ```
 
 ### delta-notifier configuration
@@ -18,11 +18,7 @@ This service monitors for new `LegalResource`'s ("Publications") in [Staatsblad-
   match: {
     predicate: {
       type: 'uri',
-      value: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
-    },
-    object: {
-      type: 'uri',
-      value: 'http://data.europa.eu/eli/ontology#LegalResource' // Example type.
+      value: 'http://data.europa.eu/eli/ontology#id_local'
     }
   },
   callback: {
@@ -31,7 +27,7 @@ This service monitors for new `LegalResource`'s ("Publications") in [Staatsblad-
   },
   options: {
     resourceFormat: 'v0.0.1',
-    gracePeriod: 250,
+    gracePeriod: 15000,
     ignoreFromSelf: false
   }
 }
