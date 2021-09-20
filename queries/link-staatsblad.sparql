@@ -1,0 +1,75 @@
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX dossier: <https://data.vlaanderen.be/ns/dossier#>
+PREFIX adms: <http://www.w3.org/ns/adms#>
+PREFIX eli: <http://data.europa.eu/eli/ontology#>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX pub: <http://mu.semte.ch/vocabularies/ext/publicatie/>
+PREFIX mu: <http://mu.semte.ch/vocabularies/core/>
+
+DELETE {
+    GRAPH <http://mu.semte.ch/graphs/organizations/kanselarij> {
+        ?publicationFlow adms:status ?publicationStatus .
+
+        ?publicationActivity prov:generated ?decisionKanselarij .
+        ?decisionKanselarij mu:uuid ?decisionKanselarijId .
+        ?decisionKanselarij eli:date_publication ?publicationDate .
+    }
+}
+INSERT {
+    GRAPH <http://mu.semte.ch/graphs/organizations/kanselarij> {
+        ?publicationFlow adms:status <http://themis.vlaanderen.be/id/concept/publicatie-status/2f8dc814-bd91-4bcf-a823-baf1cdc42475> .
+
+        ?publicationSubcase dossier:Procedurestap.einddatum ?boundSubcEndDate .
+        ?publicationActivity dossier:Activiteit.einddatum ?boundActEndDate .
+
+        ?publicationActivity prov:generated ?decisionKanselarij .
+  		?decisionKanselarij a eli:LegalResource .
+        ?decisionKanselarij mu:uuid ?decisionKanselarijId .
+        ?decisionKanselarij eli:date_publication ?publicationDate .
+  		?decisionKanselarij owl:sameAs ?decisionStaatsblad .
+   	}
+}
+WHERE {
+    GRAPH <http://mu.semte.ch/graphs/staatsblad> {
+        ?decisionStaatsblad a eli:LegalResource .
+        ?decisionStaatsblad eli:id_local ?numac .
+        ?decisionStaatsblad eli:date_publication ?publicationDate .
+    }
+    GRAPH <http://mu.semte.ch/graphs/organizations/kanselarij> {
+        ?publicationFlow a pub:Publicatieaangelegenheid .
+        ?publicationFlow pub:identifier / skos:notation ?numac .
+
+        OPTIONAL { ?publicationFlow adms:status ?publicationStatus. }
+        
+        ?publicationFlow pub:doorlooptPublicatie ?publicationSubcase .
+        OPTIONAL { ?publicationSubcase dossier:Procedurestap.einddatum ?subcEndDate . }
+        BIND(IF(BOUND(?subcEndDate), ?subcEndDate, NOW()) AS ?boundSubcEndDate)
+        
+        ?publicationSubcase ^pub:publicatieVindtPlaatsTijdens ?publicationActivity .
+        OPTIONAL { ?publicationActivity dossier:Activiteit.einddatum ?actEndDate . }
+        BIND(IF(BOUND(?actEndDate), ?actEndDate, NOW()) AS ?boundActEndDate)
+
+        OPTIONAL {
+      		?publicationActivity prov:generated ?optionalDecisionKanselarij .
+            ?optionalDecisionKanselarij mu:uuid ?optionalDecisionKanselarijId .
+    	}
+        
+        BIND (IF(BOUND(?optionalDecisionKanselarijId),
+                ?optionalDecisionKanselarijId, 
+                STRUUID()
+      	) AS ?decisionKanselarijId)
+
+        BIND (IF(BOUND(?optionalDecisionKanselarij), 
+                ?optionalDecisionKanselarij,
+        		IRI(CONCAT("http://themis.vlaanderen.be/id/besluit/", ?decisionKanselarijId))
+      	) AS ?decisionKanselarij)
+
+        FILTER NOT EXISTS {
+  			?publicationSubcase ^pub:publicatieVindtPlaatsTijdens ?publicationActivityRel .
+  			?publicationActivityRel prov:generated ?decisionRel .
+  			?decisionRel owl:sameAs ?decisionURI .
+  			FILTER BOUND(?decisionURI)
+		}
+    }
+}
