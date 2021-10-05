@@ -1,0 +1,40 @@
+
+# Add some staatsblad ttl to the staatsblad graph
+
+PREFIX mu: <http://mu.semte.ch/vocabularies/core/>
+
+INSERT DATA {
+    GRAPH <http://mu.semte.ch/graphs/staatsblad> {
+        <http://www.ejustice.just.fgov.be/eli/decreet/2018/01/26/2018030509> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://data.europa.eu/eli/ontology#LegalResource> .
+        <http://www.ejustice.just.fgov.be/eli/decreet/2018/01/26/2018030509> <http://data.europa.eu/eli/ontology#type_document> <http://vocab.belgif.be/auth/legal-type/DECREE#id> .
+        <http://www.ejustice.just.fgov.be/eli/decreet/2018/01/26/2018030509> <http://data.europa.eu/eli/ontology#date_document> "2018-01-26"^^<http://www.w3.org/2001/XMLSchema#date> .
+        <http://www.ejustice.just.fgov.be/eli/decreet/2018/01/26/2018030509> <http://data.europa.eu/eli/ontology#date_publication> "2018-02-23"^^<http://www.w3.org/2001/XMLSchema#date> .
+        <http://www.ejustice.just.fgov.be/eli/decreet/2018/01/26/2018030509> <http://data.europa.eu/eli/ontology#id_local> "2018030509" .
+        <http://www.ejustice.just.fgov.be/eli/decreet/2018/01/26/2018030509> <http://www.w3.org/2002/07/owl#sameAs> <http://www.ejustice.just.fgov.be/eli/decret/2018/01/26/2018030509> .
+        <http://www.ejustice.just.fgov.be/eli/decreet/2018/01/26/2018030509> <http://data.europa.eu/eli/ontology#responsibility_of> "VLAAMSE OVERHEID"@nl .
+        <http://www.ejustice.just.fgov.be/eli/decreet/2018/01/26/2018030509> <http://data.europa.eu/eli/ontology#is_realized_by> <http://www.ejustice.just.fgov.be/eli/decreet/2018/01/26/2018030509/justel> .
+        <http://www.ejustice.just.fgov.be/eli/decreet/2018/01/26/2018030509/justel> <http://data.europa.eu/eli/ontology#realizes> <http://www.ejustice.just.fgov.be/eli/decreet/2018/01/26/2018030509> .
+        <http://www.ejustice.just.fgov.be/eli/decreet/2018/01/26/2018030509/justel> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://data.europa.eu/eli/ontology#LegalExpression> .
+        <http://www.ejustice.just.fgov.be/eli/decreet/2018/01/26/2018030509/justel> <http://data.europa.eu/eli/ontology#language> <http://publications.europa.eu/resource/authority/language/NED> .
+        <http://www.ejustice.just.fgov.be/eli/decreet/2018/01/26/2018030509/justel> <http://data.europa.eu/eli/ontology#title> "Decreet tot oprichting van het privaatrechtelijk vormgegeven extern verzelfstandigd agentschap Koninklijk Museum voor Schone Kunsten Antwerpen in de vorm van een vereniging zonder winstoogmerk (1)"@nl .
+        <http://www.ejustice.just.fgov.be/eli/decreet/2018/01/26/2018030509/justel> <http://data.europa.eu/eli/ontology#publisher_agent> <http://org.belgif.be/cbe/org/0307_614_813#id> .
+        <http://www.ejustice.just.fgov.be/eli/decreet/2018/01/26/2018030509/justel> <http://data.europa.eu/eli/ontology#is_embodied_by> <http://www.ejustice.just.fgov.be/eli/decreet/2018/01/26/2018030509/justel/html> .
+        <http://www.ejustice.just.fgov.be/eli/decreet/2018/01/26/2018030509/justel/html> <http://data.europa.eu/eli/ontology#embodies> <http://www.ejustice.just.fgov.be/eli/decreet/2018/01/26/2018030509/justel> .
+        <http://www.ejustice.just.fgov.be/eli/decreet/2018/01/26/2018030509/justel/html> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://data.europa.eu/eli/ontology#Format> .
+        <http://www.ejustice.just.fgov.be/eli/decreet/2018/01/26/2018030509/justel/html> <http://data.europa.eu/eli/ontology#format> <http://www.iana.org/assignments/media-types/text/html> .
+        
+        <http://www.ejustice.just.fgov.be/eli/decreet/2018/01/26/2018030509> mu:uuid "bccd464c-9907-4211-a76f-16e46036bfa9" .
+        <http://www.ejustice.just.fgov.be/eli/decreet/2018/01/26/2018030509/justel> mu:uuid "63045a11-b754-407e-99fa-7ffb72208ca4" .
+        <http://www.ejustice.just.fgov.be/eli/decreet/2018/01/26/2018030509/justel/html> mu:uuid "55fe16cd-a8ef-421c-91e7-1fc6336364d9" .
+    }
+}
+
+# Remove the staatsblad link after it has been added
+
+PREFIX prov: <http://www.w3.org/ns/prov#>
+
+DELETE DATA {
+    GRAPH <http://mu.semte.ch/graphs/organizations/kanselarij> {
+        <http://themis.vlaanderen.be/id/concept/publicatie-activiteit/60fe1d39cd055c0011077b03> prov:generated <http://www.ejustice.just.fgov.be/eli/decreet/2018/01/26/2018030509> .
+    }
+}
