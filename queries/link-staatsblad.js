@@ -60,7 +60,7 @@ PREFIX prov: <http://www.w3.org/ns/prov#>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX pub: <http://mu.semte.ch/vocabularies/ext/publicatie/>
 
-SELECT ?publicationFlow ?publicationStatus ?numac ?publicationSubcase ?publicationActivity ?staatsbladDecision ?ovrbDecision
+SELECT DISTINCT ?publicationFlow ?numac ?staatsbladDecision
 WHERE {
     GRAPH <http://mu.semte.ch/graphs/staatsblad> {
         ?staatsbladDecision a eli:LegalResource ;
@@ -69,11 +69,9 @@ WHERE {
     }
     GRAPH <http://mu.semte.ch/graphs/organizations/kanselarij> {
         ?publicationFlow a pub:Publicatieaangelegenheid .
-        OPTIONAL { ?publicationFlow adms:status ?publicationStatus. }
         ?publicationFlow pub:identifier / skos:notation ?numac .
         
         ?publicationFlow pub:doorlooptPublicatie ?publicationSubcase .
-        OPTIONAL { ?publicationSubcase dossier:Procedurestap.einddatum ?subcEndDate . }
         
         ?publicationSubcase ^pub:publicatieVindtPlaatsTijdens ?publicationActivity .
         FILTER NOT EXISTS { ?publicationActivity prov:generated ?staatsbladDecision . }
