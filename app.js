@@ -2,7 +2,7 @@ import bodyParser from 'body-parser';
 import debounce from 'debounce';
 import { app, errorHandler } from 'mu';
 import { filterDeltaForInsertedPredicates } from './lib/delta';
-import linkStaatsblad from './queries/link-staatsblad';
+import { linkStaatsblad } from './queries/link-staatsblad';
 
 const NUMAC_PREDICATES = [
   'http://data.europa.eu/eli/ontology#id_local',

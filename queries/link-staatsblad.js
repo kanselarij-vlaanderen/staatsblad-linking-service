@@ -1,4 +1,7 @@
-import { updateSudo } from '@lblod/mu-auth-sudo';
+import { querySudo, updateSudo } from '@lblod/mu-auth-sudo';
+import { sparqlEscapeString } from 'mu';
+
+const STAATSBLAD_ELI_DOMAIN = 'http://www.ejustice.just.fgov.be/eli/';
 
 function linkStaatsblad (subject, graphs) {
   const queryString = `PREFIX dossier: <https://data.vlaanderen.be/ns/dossier#>
@@ -45,4 +48,43 @@ WHERE {
   return updateSudo(queryString);
 }
 
-export default linkStaatsblad;
+function selectUnlinkedPublications () {
+  const queryString = `PREFIX dossier: <https://data.vlaanderen.be/ns/dossier#>
+PREFIX adms: <http://www.w3.org/ns/adms#>
+PREFIX eli: <http://data.europa.eu/eli/ontology#>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX pub: <http://mu.semte.ch/vocabularies/ext/publicatie/>
+
+SELECT ?publicationFlow ?publicationStatus ?numac ?publicationSubcase ?publicationActivity ?staatsbladDecision ?ovrbDecision
+WHERE {
+    GRAPH <http://mu.semte.ch/graphs/staatsblad> {
+        ?staatsbladDecision a eli:LegalResource ;
+            eli:id_local ?numac .
+        FILTER(STRSTARTS(STR(?staatsbladDecision), ${sparqlEscapeString(STAATSBLAD_ELI_DOMAIN)}))
+    }
+    GRAPH <http://mu.semte.ch/graphs/organizations/kanselarij> {
+        ?publicationFlow a pub:Publicatieaangelegenheid .
+        OPTIONAL { ?publicationFlow adms:status ?publicationStatus. }
+        ?publicationFlow pub:identifier / skos:notation ?numac .
+        
+        ?publicationFlow pub:doorlooptPublicatie ?publicationSubcase .
+        OPTIONAL { ?publicationSubcase dossier:Procedurestap.einddatum ?subcEndDate . }
+        
+        ?publicationSubcase ^pub:publicatieVindtPlaatsTijdens ?publicationActivity .
+        FILTER NOT EXISTS { ?publicationActivity prov:generated ?staatsbladDecision . }
+        OPTIONAL {
+            ?publicationActivity prov:generated ?ovrbDecision .
+            FILTER(! STRSTARTS(STR(?staatsbladDecision), ${sparqlEscapeString(STAATSBLAD_ELI_DOMAIN)}))
+        }
+        OPTIONAL { ?publicationActivity dossier:Activiteit.einddatum ?actEndDate . }
+    }
+}
+`;
+  return querySudo(queryString);
+}
+
+export default {
+  linkStaatsblad,
+  selectUnlinkedPublications
+};
