@@ -3,56 +3,12 @@ import {
   sparqlEscapeString, sparqlEscapeUri, sparqlEscapeDateTime,
   uuid as generateUuid
 } from 'mu';
+import { parseSparqlResults } from './util';
 
 const STAATSBLAD_ELI_DOMAIN = 'http://www.ejustice.just.fgov.be/eli/';
 const PUBLICATION_STATUS_MOD_BASE_URI = 'http://www.ejustice.just.fgov.be/eli/';
 
-function linkStaatsblad (subject, graphs) {
-  const queryString = `PREFIX dossier: <https://data.vlaanderen.be/ns/dossier#>
-PREFIX adms: <http://www.w3.org/ns/adms#>
-PREFIX eli: <http://data.europa.eu/eli/ontology#>
-PREFIX prov: <http://www.w3.org/ns/prov#>
-PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-PREFIX pub: <http://mu.semte.ch/vocabularies/ext/publicatie/>
-
-DELETE {
-    GRAPH <http://mu.semte.ch/graphs/organizations/kanselarij> {
-        ?publicationFlow adms:status ?publicationStatus .
-    }
-}
-INSERT {
-    GRAPH <http://mu.semte.ch/graphs/organizations/kanselarij> {
-        ?publicationFlow adms:status <http://themis.vlaanderen.be/id/concept/publicatie-status/2f8dc814-bd91-4bcf-a823-baf1cdc42475> .
-        ?publicationActivity prov:generated ?decision .
-        ?publicationSubcase dossier:Procedurestap.einddatum ?boundSubcEndDate .
-        ?publicationActivity dossier:Activiteit.einddatum ?boundActEndDate .
-    }
-}
-WHERE {
-    GRAPH <http://mu.semte.ch/graphs/staatsblad> {
-        ?decision a eli:LegalResource ;
-            eli:id_local ?numac .
-    }
-    GRAPH <http://mu.semte.ch/graphs/organizations/kanselarij> {
-        ?publicationFlow a pub:Publicatieaangelegenheid .
-        OPTIONAL { ?publicationFlow adms:status ?publicationStatus. }
-        ?publicationFlow pub:identifier / skos:notation ?numac .
-        
-        ?publicationFlow pub:doorlooptPublicatie ?publicationSubcase .
-        OPTIONAL { ?publicationSubcase dossier:Procedurestap.einddatum ?subcEndDate . }
-        BIND(IF(BOUND(?subcEndDate), ?subcEndDate, NOW()) AS ?boundSubcEndDate)
-        
-        ?publicationSubcase ^pub:publicatieVindtPlaatsTijdens ?publicationActivity .
-        FILTER NOT EXISTS { ?publicationActivity prov:generated ?decision . }
-        OPTIONAL { ?publicationActivity dossier:Activiteit.einddatum ?actEndDate . }
-        BIND(IF(BOUND(?actEndDate), ?actEndDate, NOW()) AS ?boundActEndDate)
-    }
-}
-`;
-  return updateSudo(queryString);
-}
-
-function selectUnlinkedPublications () {
+async function selectUnlinkedPublications () {
   const queryString = `PREFIX dossier: <https://data.vlaanderen.be/ns/dossier#>
 PREFIX adms: <http://www.w3.org/ns/adms#>
 PREFIX eli: <http://data.europa.eu/eli/ontology#>
@@ -74,11 +30,12 @@ WHERE {
         ?publicationFlow pub:doorlooptPublicatie ?publicationSubcase .
         
         ?publicationSubcase ^pub:publicatieVindtPlaatsTijdens ?publicationActivity .
-        FILTER NOT EXISTS { ?publicationActivity prov:generated ?staatsbladDecision . }
     }
+    FILTER NOT EXISTS { ?publicationActivity prov:generated ?staatsbladDecision . }
 }
 `;
-  return querySudo(queryString);
+  const queryResult = await querySudo(queryString);
+  return parseSparqlResults(queryResult);
 }
 
 function linkPublication (pubFlow, staatsbladDecision, modificationDate) {
@@ -134,8 +91,7 @@ WHERE {
   return updateSudo(queryString);
 }
 
-export default {
-  linkStaatsblad,
+export {
   selectUnlinkedPublications,
   linkPublication
 };
