@@ -1,6 +1,6 @@
 import { querySudo, updateSudo } from '@lblod/mu-auth-sudo';
 import {
-  sparqlEscapeString, sparqlEscapeUri, sparqlEscapeDateTime,
+  sparqlEscapeString, sparqlEscapeUri, sparqlEscapeDateTime, sparqlEscapeDate,
   uuid as generateUuid
 } from 'mu';
 import { parseSparqlResults } from './util';
@@ -54,12 +54,14 @@ PREFIX mu: <http://mu.semte.ch/vocabularies/core/>
 DELETE {
     GRAPH <http://mu.semte.ch/graphs/organizations/kanselarij> {
         ${pubFlowUri} adms:status ?publicationStatus .
+        ${pubFlowUri} dossier:sluitingsdatum ?pubFlowClosingDate .
         ?ovrbDecision ?ovrbDecisionPred ?ovrbDecisionObj .
     }
 }
 INSERT {
     GRAPH <http://mu.semte.ch/graphs/organizations/kanselarij> {
         ${pubFlowUri} adms:status <http://themis.vlaanderen.be/id/concept/publicatie-status/2f8dc814-bd91-4bcf-a823-baf1cdc42475> ;
+            dossier:sluitingsdatum ${sparqlEscapeDate(modificationDate)} .
             prov:hadActivity ${pubStatModUri} .
         ${pubStatModUri} a pub:PublicatieStatusWijziging ;
             mu:uuid ${sparqlEscapeString(pubStatModUuid)} ;
@@ -72,7 +74,8 @@ INSERT {
 WHERE {
     GRAPH <http://mu.semte.ch/graphs/organizations/kanselarij> {
         ${pubFlowUri} a pub:Publicatieaangelegenheid .
-        
+        OPTIONAL { ${pubFlowUri} dossier:sluitingsdatum ?pubFlowClosingDate . }
+
         ${pubFlowUri} pub:doorlooptPublicatie ?publicationSubcase .
         OPTIONAL { ?publicationSubcase dossier:Procedurestap.einddatum ?subcEndDate . }
         BIND(IF(BOUND(?subcEndDate), ?subcEndDate, ${sparqlEscapeDateTime(modificationDate)}) AS ?boundSubcEndDate)
