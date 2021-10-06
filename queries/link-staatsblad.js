@@ -80,7 +80,7 @@ WHERE {
         ?publicationSubcase ^pub:publicatieVindtPlaatsTijdens ?publicationActivity .
         OPTIONAL {
             ?publicationActivity prov:generated ?ovrbDecision .
-            FILTER(! STRSTARTS(STR(?staatsbladDecision), ${sparqlEscapeString(STAATSBLAD_ELI_DOMAIN)}))
+            FILTER(! STRSTARTS(STR(?ovrbDecision), ${sparqlEscapeString(STAATSBLAD_ELI_DOMAIN)}))
             ?ovrbDecision ?ovrbDecisionPred ?ovrbDecisionObj .
         }
         OPTIONAL { ?publicationActivity dossier:Activiteit.einddatum ?actEndDate . }
