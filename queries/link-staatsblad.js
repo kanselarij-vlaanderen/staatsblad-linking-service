@@ -6,7 +6,7 @@ import {
 import { parseSparqlResults } from './util';
 
 const STAATSBLAD_ELI_DOMAIN = 'http://www.ejustice.just.fgov.be/eli/';
-const PUBLICATION_STATUS_MOD_BASE_URI = 'http://www.ejustice.just.fgov.be/eli/';
+const PUBLICATION_STATUS_MOD_BASE_URI = 'http://themis.vlaanderen.be/id/publicatie-status-wijziging/';
 
 async function selectUnlinkedPublications () {
   const queryString = `PREFIX dossier: <https://data.vlaanderen.be/ns/dossier#>
@@ -41,7 +41,7 @@ WHERE {
 function linkPublication (pubFlow, staatsbladDecision, modificationDate) {
   const pubFlowUri = sparqlEscapeUri(pubFlow);
   const pubStatModUuid = generateUuid();
-  const pubStatModUri = sparqlEscapeUri(`${PUBLICATION_STATUS_MOD_BASE_URI}/${pubStatModUuid}`);
+  const pubStatModUri = sparqlEscapeUri(`${PUBLICATION_STATUS_MOD_BASE_URI}${pubStatModUuid}`);
 
   const queryString = `PREFIX dossier: <https://data.vlaanderen.be/ns/dossier#>
 PREFIX adms: <http://www.w3.org/ns/adms#>
