@@ -55,6 +55,9 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 DELETE {
     GRAPH <http://mu.semte.ch/graphs/organizations/kanselarij> {
         ${pubFlowUri} adms:status ?publicationStatus .
+        ${pubFlowUri} prov:hadActivity ?oldPubStatusChange .
+        ?oldPubStatusChange ?oldPubStatusChangePred ?oldPubStatusChangeObj .
+
         ${pubFlowUri} dossier:sluitingsdatum ?pubFlowClosingDate .
         ?ovrbDecision ?ovrbDecisionPred ?ovrbDecisionObj .
     }
@@ -78,6 +81,12 @@ WHERE {
             a pub:Publicatieaangelegenheid ;
             adms:status ?publicationStatus .
         OPTIONAL { ${pubFlowUri} dossier:sluitingsdatum ?pubFlowClosingDate . }
+        OPTIONAL {
+            ${pubFlowUri} prov:hadActivity ?oldPubStatusChange .
+            ?oldPubStatusChange
+                a pub:PublicatieStatusWijziging ;
+                ?oldPubStatusChangePred ?oldPubStatusChangeObj .
+        }
 
         ${pubFlowUri} pub:doorlooptPublicatie ?publicationSubcase .
         OPTIONAL { ?publicationSubcase dossier:Procedurestap.einddatum ?subcEndDate . }
