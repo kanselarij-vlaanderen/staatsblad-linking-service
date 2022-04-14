@@ -74,7 +74,9 @@ INSERT {
 }
 WHERE {
     GRAPH <http://mu.semte.ch/graphs/organizations/kanselarij> {
-        ${pubFlowUri} a pub:Publicatieaangelegenheid .
+        ${pubFlowUri}
+            a pub:Publicatieaangelegenheid ;
+            adms:status ?publicationStatus .
         OPTIONAL { ${pubFlowUri} dossier:sluitingsdatum ?pubFlowClosingDate . }
 
         ${pubFlowUri} pub:doorlooptPublicatie ?publicationSubcase .
