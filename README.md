@@ -10,7 +10,7 @@ Note that since the Staatsblad legal resources ELI-dataset is currently limited 
 
 ```yaml
   staatsblad-linking:
-    image: kanselarij/staatsblad-linking-service:0.2.0
+    image: kanselarij/staatsblad-linking-service:0.6.1
 ```
 
 ### delta-notifier configuration
