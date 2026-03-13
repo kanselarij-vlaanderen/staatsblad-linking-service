@@ -28,7 +28,7 @@ app.post('/run', async (req, res) => {
   linkStaatsblad();
 });
 
-app.post('/delta', bodyParser.json(), async (req, res) => {
+app.post('/delta', bodyParser.json({ limit: '100mb' }), async (req, res) => {
   res.status(202).end();
   const insertedSubjects = filterDeltaForInsertedPredicates(req.body, NUMAC_PREDICATES);
   if (insertedSubjects.length > 0) {
