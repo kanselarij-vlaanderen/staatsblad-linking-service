@@ -11,6 +11,8 @@ Note that since the Staatsblad legal resources ELI-dataset is currently limited 
 ```yaml
   staatsblad-linking:
     image: kanselarij/staatsblad-linking-service:0.6.1
+    environment:
+      ALLOW_MU_AUTH_SUDO: "true"
 ```
 
 ### delta-notifier configuration

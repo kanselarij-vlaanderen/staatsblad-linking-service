@@ -1,8 +1,5 @@
-import { querySudo, updateSudo } from '@lblod/mu-auth-sudo';
 import {
-  sparqlEscapeString, sparqlEscapeUri, sparqlEscapeDateTime, sparqlEscapeDate,
-  uuid as generateUuid
-} from 'mu';
+  sparqlEscapeString, sparqlEscapeUri, sparqlEscapeDateTime, sparqlEscapeDate, uuid as generateUuid, query, update } from 'mu';
 import { parseSparqlResults } from './util';
 
 const STAATSBLAD_ELI_DOMAIN = 'http://www.ejustice.just.fgov.be/eli/';
@@ -34,7 +31,7 @@ WHERE {
     FILTER NOT EXISTS { ?publicationActivity prov:generated ?staatsbladDecision . }
 }
 `;
-  const queryResult = await querySudo(queryString);
+  const queryResult = await query(queryString, { sudo: true });
   return parseSparqlResults(queryResult);
 }
 
@@ -103,7 +100,7 @@ WHERE {
     }
 }
 `;
-  return updateSudo(queryString);
+  return update(queryString, { sudo: true });
 }
 
 export {
